@@ -8,11 +8,20 @@ var client = new Twitter({
   access_token_secret: Credentials.TWITTER_access_token_secret
 });
 
-var stream = client.stream('statuses/filter', {track: 'javascript'});
-stream.on('data', function(event) {
-  console.log(event);
-});
+var app = require('express')();
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
+var stream = null;
 
-stream.on('error', function(error) {
-  throw error;
+server.listen(80);
+
+io.on('connection', function (socket) {
+  socket.emit('news', { hello: 'world' });
+  socket.on('search', function (keyword) {
+    console.log(keyword);
+    stream = client.stream('statuses/filter', {track: keyword});
+    stream.on('data', function(event) {
+      socket.emit('tweet', event);
+    });
+  });
 });
