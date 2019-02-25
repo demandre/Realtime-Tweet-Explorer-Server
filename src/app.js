@@ -13,15 +13,21 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var stream = null;
 
-server.listen(80);
+server.listen(3080);
 
 io.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
   socket.on('search', function (keyword) {
     console.log(keyword);
+    if (stream) {
+      console.log(client);
+      stream.destroy();
+    }
     stream = client.stream('statuses/filter', {track: keyword});
     stream.on('data', function(event) {
       socket.emit('tweet', event);
+    });
+    stream.on('error', function(error) {
+      console.log(error);
     });
   });
 });
