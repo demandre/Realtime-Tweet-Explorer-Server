@@ -19,7 +19,6 @@ io.on('connection', function (socket) {
   socket.on('search', function (keyword) {
     console.log(keyword);
     if (stream) {
-      console.log(client);
       stream.destroy();
     }
     stream = client.stream('statuses/filter', {track: keyword});
