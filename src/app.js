@@ -21,7 +21,8 @@ io.on('connection', function (socket) {
     if (stream) {
       stream.destroy();
     }
-    stream = client.stream('statuses/filter', {track: keyword});
+
+    stream = client.stream('statuses/filter', {'track': keyword});
     stream.on('data', function(event) {
       socket.emit('tweet', event);
     });
