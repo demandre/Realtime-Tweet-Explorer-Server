@@ -12,6 +12,7 @@ var app = require('express')();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var stream = null;
+var tweet = null;
 
 server.listen(3080);
 
@@ -24,7 +25,21 @@ io.on('connection', function (socket) {
 
     stream = client.stream('statuses/filter', {'track': keyword});
     stream.on('data', function(event) {
-      socket.emit('tweet', event);
+      tweet = {
+        'created_at': event.created_at,
+        'id_str': event.id_str,
+        'text': event.text,
+        'user': {
+          'name': event.user.name,
+          'screen_name': event.user.screen_name,
+          'profile_image_url': event.user.profile_image_url
+        },
+        'reply_count': event.reply_count,
+        'retweet_count': event.retweet_count,
+        'favorite_count': event.favorite_count,
+        'geo': event.geo
+      };
+      socket.emit('tweet', tweet);
     });
     stream.on('error', function(error) {
       console.log(error);
